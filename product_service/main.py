@@ -21,9 +21,9 @@ def startup():
                   (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, price REAL, stock INTEGER, image_url TEXT)''')
     
     # Thêm dữ liệu mẫu
-    conn.execute("INSERT INTO products (name, price, stock, image_url) VALUES ('Python Programming', 416000, 10, 'c:/Users/khang/Downloads/download.jpg')")
-    conn.execute("INSERT INTO products (name, price, stock, image_url) VALUES ('Building Microservices', 1478000, 5, 'c:/Users/khang/Downloads/download.jpg')")
-    conn.execute("INSERT INTO products (name, price, stock, image_url) VALUES ('FastAPI Cookbook', 1738000, 20, 'c:/Users/khang/Downloads/download.jpg')")
+    conn.execute("INSERT INTO products (name, price, stock, image_url) VALUES ('Python Programming', 416000, 10, 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&w=400&q=80')")
+    conn.execute("INSERT INTO products (name, price, stock, image_url) VALUES ('Building Microservices', 1478000, 5, 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=400&q=80')")
+    conn.execute("INSERT INTO products (name, price, stock, image_url) VALUES ('FastAPI Cookbook', 1738000, 20, 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=400&q=80')")
     conn.commit()
 
 class Product(BaseModel):

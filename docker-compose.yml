@@ -18,6 +18,7 @@ services:
       - "8002:8002"
     environment:
       - PORT=8002
+      - PRODUCT_SERVICE_URL=http://product_service:8001/products
 
   api_gateway:
     build:

@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import httpx
 from fastapi import FastAPI, HTTPException
@@ -5,7 +6,7 @@ from pydantic import BaseModel
 
 app = FastAPI(title="Order Service", description="Dịch vụ xử lý đơn hàng")
 
-PRODUCT_SERVICE_URL = "http://localhost:8001/products"
+PRODUCT_SERVICE_URL = os.getenv("PRODUCT_SERVICE_URL", "http://localhost:8001/products")
 DB_FILE = "orders.db"
 
 def get_db():
