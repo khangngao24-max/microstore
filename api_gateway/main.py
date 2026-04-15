@@ -10,7 +10,7 @@ app = FastAPI(
     description="Đây là cửa ngõ tập trung. Khi bạn thao tác ở đây, Gateway sẽ tự động chuyển lệnh đến đúng Service bên dưới."
 )
 
-@app.get("/", tags=["Health Check"])
+@app.get("/api/health", tags=["Health Check"])
 async def root():
     return {"message": "API Gateway is running. If you see this, the server is working!"}
 
