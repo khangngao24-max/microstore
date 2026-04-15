@@ -2,12 +2,12 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+# Copy và cài thư viện
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY order_service/ /app/order_service/
-
-WORKDIR /app/order_service
+# Copy code service
+COPY main.py .
 
 EXPOSE 8002
 

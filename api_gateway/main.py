@@ -71,11 +71,21 @@ async def get_orders():
 
 # Phục vụ file tĩnh Frontend (Dùng cho môi trường production / cloud)
 current_dir = os.path.dirname(os.path.abspath(__file__))
-frontend_dir = os.path.join(current_dir, "..", "frontend")
 
-if os.path.exists(frontend_dir):
-    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
-elif os.path.exists(os.path.join(current_dir, "frontend")):
-    app.mount("/", StaticFiles(directory=os.path.join(current_dir, "frontend"), html=True), name="frontend")
-else:
+# Thử nhiều đường dẫn để tương thích cả local và Railway
+possible_frontend_dirs = [
+    os.path.join(current_dir, "frontend"),          # Railway: frontend nằm cùng cấp
+    os.path.join(current_dir, "..", "frontend"),     # Local: frontend nằm thư mục cha
+    "/app/frontend",                                  # Docker: đường dẫn tuyệt đối
+]
+
+frontend_mounted = False
+for fdir in possible_frontend_dirs:
+    if os.path.exists(fdir):
+        app.mount("/", StaticFiles(directory=fdir, html=True), name="frontend")
+        print(f"Frontend mounted from: {fdir}")
+        frontend_mounted = True
+        break
+
+if not frontend_mounted:
     print("Warning: Frontend directory not found. Please ensure it exists if you want to serve static files.")
