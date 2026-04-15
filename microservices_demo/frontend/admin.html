@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Microstore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --sidebar-bg: #1e293b;
+            --text-dark: #0f172a;
+            --primary: #3b82f6;
+            --card-bg: white;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; height: 100vh; background: var(--bg-color); color: var(--text-dark); }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar-bg); color: white; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+        .sidebar-brand { font-size: 1.8rem; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .sidebar-brand span { color: var(--primary); }
+        .nav-item { padding: 12px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s; color: #cbd5e1; display: flex; gap: 10px; }
+        .nav-item:hover, .nav-item.active { background: var(--primary); color: white; }
+        .back-link { margin-top: auto; padding: 12px 16px; color: #cbd5e1; text-decoration: none; font-weight: 600; border-radius: 8px; display: block; text-align: center; border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
+        .back-link:hover { background: rgba(255,255,255,0.1); color: white; }
+        
+        /* Content */
+        .content { flex: 1; padding: 40px; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .header h1 { font-size: 2.2rem; font-weight: 800; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .stat-card { background: var(--card-bg); padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .stat-card h3 { color: #64748b; font-size: 1rem; margin-bottom: 8px; font-weight: 600; }
+        .stat-card .value { font-size: 2rem; font-weight: 800; color: var(--text-dark); }
+        
+        /* Table */
+        .panel { background: var(--card-bg); border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow: hidden; display: none; }
+        .panel.active { display: block; animation: fade 0.4s; }
+        @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .panel-header { padding: 20px 24px; border-bottom: 1px solid var(--border); background: #f8fafc; }
+        .panel-header h2 { font-size: 1.2rem; font-weight: 700; color: #334155; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 16px 24px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { font-weight: 600; color: #64748b; background: white; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { color: #334155; font-weight: 500; }
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; background: #dcfce7; color: #16a34a; display: inline-block; }
+        .stock-badge { padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; }
+        .stock-high { background: #dbeafe; color: #2563eb; }
+        .stock-low { background: #fee2e2; color: #dc2626; }
+        
+        /* Login Overlay */
+        .login-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-color); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .login-card { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .login-card h2 { margin-bottom: 8px; font-weight: 800; }
+        .login-card p { color: #64748b; margin-bottom: 24px; font-size: 0.95rem; }
+        .login-form input { width: 100%; padding: 14px 16px; margin-bottom: 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; outline: none; transition: 0.3s; }
+        .login-form input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .login-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .login-btn:hover { background: #2563eb; }
+        .login-error { color: #dc2626; font-size: 0.9rem; margin-bottom: 16px; display: none; }
+    </style>
+</head>
+<body>
+    <!-- Login Overlay -->
+    <div id="login-overlay" class="login-overlay" style="display: none;">
+        <div class="login-card">
+            <h2>Đăng nhập Admin</h2>
+            <p>Vui lòng đăng nhập để tiếp tục</p>
+            <div id="login-error" class="login-error">Sai tài khoản hoặc mật khẩu!</div>
+            <form id="login-form" class="login-form" onsubmit="handleLogin(event)">
+                <input type="text" id="username" placeholder="Tên đăng nhập (admin)" required>
+                <input type="password" id="password" placeholder="Mật khẩu (123456)" required>
+                <button type="submit" class="login-btn">Đăng nhập</button>
+            </form>
+            <div style="margin-top: 15px;">
+                <a href="index.html" style="color: #64748b; text-decoration: none; font-size: 0.9rem;">← Quay lại cửa hàng</a>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar">
+        <div class="sidebar-brand">📱 <span>MicroAdmin</span></div>
+        <div class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')">📊 Tổng quan</div>
+        <div class="nav-item" id="nav-inventory" onclick="switchTab('inventory')">📦 Kho hàng</div>
+        <div class="nav-item" id="nav-orders" onclick="switchTab('orders')">📝 Đơn đặt hàng</div>
+        <a href="index.html" class="back-link">← Quay lại Cửa hàng</a>
+    </div>
+    
+    <div class="content">
+        <div class="header">
+            <h1 id="page-title">Tổng quan hệ thống</h1>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="fetchAllData()" style="padding: 10px 20px; border-radius: 8px; border:none; background: var(--primary); color:white; font-weight:bold; cursor:pointer;">Làm mới dữ liệu</button>
+                <button onclick="logout()" style="padding: 10px 20px; border-radius: 8px; border:1px solid #dc2626; background: white; color:#dc2626; font-weight:bold; cursor:pointer;">Đăng xuất</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Tổng doanh thu</h3>
+                <div class="value" id="stat-revenue">0 ₫</div>
+            </div>
+            <div class="stat-card">
+                <h3>Tổng đơn hàng</h3>
+                <div class="value" id="stat-total-orders">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Loại sản phẩm</h3>
+                <div class="value" id="stat-products">0</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Panel shows recent orders -->
+        <div id="panel-dashboard" class="panel active">
+            <div class="panel-header"><h2>10 Đơn hàng gần nhất</h2></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã ĐH</th>
+                        <th>Sản phẩm ID</th>
+                        <th>Số lượng</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-orders-list">
+                    <tr><td colspan="5" align="center">Chưa có dữ liệu</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Inventory Panel -->
+        <div id="panel-inventory" class="panel">
+            <div class="panel-header"><h2>Quản lý Kho hàng</h2></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Giá bán</th>
+                        <th>Tồn kho</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-list">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Orders Panel -->
+        <div id="panel-orders" class="panel">
+            <div class="panel-header"><h2>Tất cả đơn hàng</h2></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã ĐH</th>
+                        <th>Sản phẩm ID</th>
+                        <th>Số lượng</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody id="all-orders-list">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="admin.js?v=4"></script>
+</body>
+</html>
