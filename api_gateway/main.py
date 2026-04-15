@@ -10,6 +10,10 @@ app = FastAPI(
     description="Đây là cửa ngõ tập trung. Khi bạn thao tác ở đây, Gateway sẽ tự động chuyển lệnh đến đúng Service bên dưới."
 )
 
+@app.get("/", tags=["Health Check"])
+async def root():
+    return {"message": "API Gateway is running. If you see this, the server is working!"}
+
 # Thêm CORS để Frontend có thể giao tiếp với Gateway
 app.add_middleware(
     CORSMiddleware,
