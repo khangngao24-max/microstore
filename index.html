@@ -1,1 +1,85 @@
-<p>aaaaaaaaaaaaaaaaaa</p>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microstore - Sách Công Nghệ</title>
+    <!-- Modern Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=4">
+</head>
+<body>
+    <div class="background-effects">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+    
+    <header>
+        <div class="container header-container">
+            <h1>Micro<span class="highlight">Store</span></h1>
+            <nav>
+                <button id="btn-products" class="nav-btn active">Trang chủ</button>
+                <button id="btn-orders" class="nav-btn">Lịch sử</button>
+                <button id="btn-cart" class="nav-btn cart-toggle-btn">
+                    🛒 Giỏ hàng
+                    <span id="cart-badge" class="badge-count">0</span>
+                </button>
+                <a href="admin.html" class="nav-btn admin-link">⚙️ Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="products-view" class="view-section active">
+            <div class="section-header">
+                <div>
+                    <h2>Sách Nổi Bật</h2>
+                    <p class="subtitle">Khám phá những tựa sách công nghệ hay nhất</p>
+                </div>
+                <button class="btn-refresh" onclick="fetchProducts()">
+                    <span class="icon">🔄</span> Làm mới
+                </button>
+            </div>
+            <div id="products-grid" class="grid">
+                <!-- Products list here -->
+                <div class="loading">Đang tải sản phẩm...</div>
+            </div>
+        </section>
+
+        <section id="orders-view" class="view-section">
+            <div class="section-header">
+                <h2>Lịch sử đặt hàng</h2>
+                <button class="btn-refresh" onclick="fetchOrders()">🔄 Làm mới</button>
+            </div>
+            <div id="orders-list" class="list-container">
+                <!-- Orders inject here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Cart Sidebar -->
+    <div id="cart-overlay" class="cart-overlay"></div>
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h2>Giỏ hàng (<span id="cart-count-title">0</span>)</h2>
+            <button id="btn-close-cart" class="btn-close">×</button>
+        </div>
+        <div id="cart-items" class="cart-items">
+            <!-- Cart items inject here -->
+            <div class="empty-state">Giỏ hàng đang trống.</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Tổng thanh toán:</span>
+                <span id="cart-total-price">0 ₫</span>
+            </div>
+            <button id="btn-checkout" class="btn-checkout" onclick="checkout()">Thanh toán ngay</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js?v=3"></script>
+</body>
+</html>
